@@ -1,29 +1,40 @@
 {
   "expo": {
-    "name": "Get Roasted",
-    "slug": "get-roasted",
+    "name": "Apex Lad",
+    "slug": "apex-lad",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "apexlad",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#1A1512"
+    },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.getroasted.app",
+      "supportsTablet": false,
+      "bundleIdentifier": "com.apexlad.app",
+      "buildNumber": "1",
       "infoPlist": {
-        "NSCameraUsageDescription": "Get Roasted needs camera access to verify your daily habits.",
-        "NSPhotoLibraryUsageDescription": "Get Roasted needs photo access to let you upload habit proof."
+        "NSCameraUsageDescription": "Apex Lad needs camera access to verify your daily habits with photos.",
+        "NSPhotoLibraryUsageDescription": "Apex Lad needs photo library access to upload habit verification photos.",
+        "NSUserNotificationsUsageDescription": "Apex Lad sends reminders to help you complete your habits and maintain your streaks.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.getroasted.app",
-      "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
-    },
     "plugins": [
-      "expo-router"
-    ]
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "sounds": []
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "53d4b067-7ab9-46ce-aef8-680c04a9030e"
+      }
+    }
   }
 }

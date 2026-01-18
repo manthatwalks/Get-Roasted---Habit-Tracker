@@ -15,6 +15,9 @@ export const Colors = {
   border: '#3D352C',
   borderLight: '#2D2620',
   borderAccent: 'rgba(193, 127, 89, 0.4)',
+
+  // In your Colors object, add:
+  error: '#EF4444',
   
   // Text Hierarchy
   textPrimary: '#F5EDE5',

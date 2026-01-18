@@ -1,21 +1,22 @@
 // components/ApexSuccessScreen.tsx
-// Tactical Success/Victory Screen
+// Tactical Success/Victory Screen - Larger image container
 
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useRef } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
   Animated,
+  Dimensions,
+  Image,
   Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Colors, BorderRadius, Spacing } from '../constants/theme';
+import { BorderRadius, Colors, Spacing } from '../constants/theme';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface ApexSuccessScreenProps {
   visible: boolean;
@@ -91,85 +92,87 @@ export default function ApexSuccessScreen({
       onRequestClose={onClose}
     >
       <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-        {/* Top Status Bar */}
-        <View style={styles.statusBar}>
-          <View style={styles.statusItem}>
-            <View style={[styles.statusDot, styles.statusDotActive]} />
-            <Text style={styles.statusText}>VERIFIED</Text>
-          </View>
-          <View style={styles.statusDivider} />
-          <View style={styles.statusItem}>
-            <Ionicons name="shield-checkmark" size={14} color={Colors.success} />
-            <Text style={styles.statusText}>LOGGED</Text>
-          </View>
-        </View>
-
-        <View style={styles.content}>
-          {/* Mission Complete Header */}
-          <View style={styles.header}>
-            <Text style={styles.missionLabel}>MISSION</Text>
-            <Text style={styles.completeLabel}>COMPLETE</Text>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Top Status Bar */}
+          <View style={styles.statusBar}>
+            <View style={styles.statusItem}>
+              <View style={[styles.statusDot, styles.statusDotActive]} />
+              <Text style={styles.statusText}>VERIFIED</Text>
+            </View>
+            <View style={styles.statusDivider} />
+            <View style={styles.statusItem}>
+              <Ionicons name="shield-checkmark" size={14} color={Colors.success} />
+              <Text style={styles.statusText}>LOGGED</Text>
+            </View>
           </View>
 
-          {/* Streak Display */}
-          <Animated.View
-            style={[
-              styles.streakContainer,
-              {
-                transform: [
-                  { scale: streakAnim },
-                  { scale: pulseAnim },
-                ],
-              },
-            ]}
-          >
-            <View style={styles.streakRing}>
-              <View style={styles.streakInner}>
-                <Text style={styles.streakNumber}>{streak}</Text>
-                <Text style={styles.streakUnit}>DAY</Text>
+          <View style={styles.content}>
+            {/* Mission Complete Header */}
+            <View style={styles.header}>
+              <Text style={styles.missionLabel}>MISSION</Text>
+              <Text style={styles.completeLabel}>COMPLETE</Text>
+            </View>
+
+            {/* Streak Display */}
+            <Animated.View
+              style={[
+                styles.streakContainer,
+                {
+                  transform: [
+                    { scale: streakAnim },
+                    { scale: pulseAnim },
+                  ],
+                },
+              ]}
+            >
+              <View style={styles.streakRing}>
+                <View style={styles.streakInner}>
+                  <Text style={styles.streakNumber}>{streak}</Text>
+                  <Text style={styles.streakUnit}>DAY</Text>
+                </View>
               </View>
-            </View>
-            <View style={styles.streakBadge}>
-              <Ionicons name="flame" size={20} color={Colors.streak} />
-            </View>
-          </Animated.View>
-
-          {/* Character Image */}
-          <Animated.View
-            style={[
-              styles.imageContainer,
-              { transform: [{ scale: scaleAnim }] },
-            ]}
-          >
-            <Image
-              source={require('../assets/images/apex-pleased.png')}
-              style={styles.characterImage}
-              resizeMode="cover"
-            />
-          </Animated.View>
-
-          {/* Message Card */}
-          <View style={styles.messageCard}>
-            <View style={styles.messageHeader}>
-              <Text style={styles.habitName}>{habitName.toUpperCase()}</Text>
-              <View style={styles.verifiedBadge}>
-                <Ionicons name="checkmark" size={12} color={Colors.background} />
+              <View style={styles.streakBadge}>
+                <Ionicons name="flame" size={20} color={Colors.streak} />
               </View>
+            </Animated.View>
+
+            {/* Character Image - LARGER */}
+            <Animated.View
+              style={[
+                styles.imageContainer,
+                { transform: [{ scale: scaleAnim }] },
+              ]}
+            >
+              <Image
+                source={require('../assets/images/apex-pleased.png')}
+                style={styles.characterImage}
+                resizeMode="cover"
+              />
+            </Animated.View>
+
+            {/* Message Card */}
+            <View style={styles.messageCard}>
+              <View style={styles.messageHeader}>
+                <Text style={styles.habitName}>{habitName.toUpperCase()}</Text>
+                <View style={styles.verifiedBadge}>
+                  <Ionicons name="checkmark" size={12} color={Colors.background} />
+                </View>
+              </View>
+              <View style={styles.messageDivider} />
+              <Text style={styles.roastMessage}>"{roastMessage}"</Text>
+              <Text style={styles.attribution}>— THE APEX LAD</Text>
             </View>
-            <View style={styles.messageDivider} />
-            <Text style={styles.roastMessage}>"{roastMessage}"</Text>
-            <Text style={styles.attribution}>— THE APEX LAD</Text>
+
+            {/* Continue Button */}
+            <TouchableOpacity style={styles.continueButton} onPress={onClose}>
+              <Text style={styles.continueText}>CONTINUE</Text>
+              <Ionicons name="arrow-forward" size={18} color={Colors.background} />
+            </TouchableOpacity>
           </View>
-
-          {/* Continue Button */}
-          <TouchableOpacity style={styles.continueButton} onPress={onClose}>
-            <Text style={styles.continueText}>CONTINUE</Text>
-            <Ionicons name="arrow-forward" size={18} color={Colors.background} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Bottom Accent */}
-        <View style={styles.bottomAccent} />
+        </ScrollView>
       </Animated.View>
     </Modal>
   );
@@ -179,6 +182,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: Spacing.xl,
   },
   statusBar: {
     flexDirection: 'row',
@@ -216,11 +223,11 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
-    paddingHorizontal: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
   },
   header: {
     alignItems: 'center',
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   missionLabel: {
     fontSize: 12,
@@ -237,13 +244,13 @@ const styles = StyleSheet.create({
   },
   streakContainer: {
     alignItems: 'center',
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
     position: 'relative',
   },
   streakRing: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     borderWidth: 3,
     borderColor: Colors.gold,
     alignItems: 'center',
@@ -254,11 +261,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   streakNumber: {
-    fontSize: 42,
+    fontSize: 36,
     fontWeight: '700',
     color: Colors.gold,
     fontVariant: ['tabular-nums'],
-    lineHeight: 46,
+    lineHeight: 40,
   },
   streakUnit: {
     fontSize: 10,
@@ -271,9 +278,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -5,
     right: -5,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: Colors.surface,
     borderWidth: 2,
     borderColor: Colors.streak,
@@ -281,13 +288,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imageContainer: {
-    width: SCREEN_WIDTH - 80,
-    height: 180,
+    width: SCREEN_WIDTH - 40,
+    height: 220,
     borderRadius: BorderRadius.card,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: Colors.border,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
+    backgroundColor: Colors.surface,
   },
   characterImage: {
     width: '100%',
@@ -299,8 +307,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.card,
     borderWidth: 1,
     borderColor: Colors.border,
-    padding: Spacing.xl,
-    marginBottom: Spacing.xl,
+    padding: Spacing.lg,
+    marginBottom: Spacing.lg,
   },
   messageHeader: {
     flexDirection: 'row',
@@ -326,15 +334,15 @@ const styles = StyleSheet.create({
   messageDivider: {
     height: 1,
     backgroundColor: Colors.border,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   roastMessage: {
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
     fontStyle: 'italic',
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   attribution: {
     fontSize: 11,
@@ -358,9 +366,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.background,
     letterSpacing: 2,
-  },
-  bottomAccent: {
-    height: 4,
-    backgroundColor: Colors.gold,
   },
 });

@@ -2,15 +2,27 @@
 import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { View, Text, ActivityIndicator } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { auth } from '../config/firebase';
-import { signInAnonymously, User } from 'firebase/auth';  // Add User here
+import { signInAnonymously, User } from 'firebase/auth';
+import { registerForPushNotifications, updateUserTimezone } from '../utils/pushNotifications';
+
+// Configure how notifications should be displayed
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 export default function RootLayout() {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);  // Fixed typing
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Sign in anonymously when app loads
     const signIn = async () => {
       try {
         const userCredential = await signInAnonymously(auth);
@@ -25,6 +37,13 @@ export default function RootLayout() {
 
     signIn();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      registerForPushNotifications();
+      updateUserTimezone();
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -46,8 +65,6 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <Stack screenOptions={{ headerShown: false }} />
   );
 }

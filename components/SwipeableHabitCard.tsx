@@ -1,19 +1,11 @@
-// components/SwipeableHabitCard.tsx
-// Visual Novel Style Habit Card - FIXED solid backgrounds
+// components/HabitCard.tsx
+// Simple habit card - tap to check-in, long-press to delete with themed modal
 
-import React, { useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Animated,
-  PanResponder,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Spacing, BorderRadius, Shadows } from '../constants/theme';
-
-const SWIPE_THRESHOLD = -80;
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { BorderRadius, Colors, Shadows, Spacing } from '../constants/theme';
+import ApexModal from './ApexModal';
 
 interface Habit {
   id: string;
@@ -23,169 +15,112 @@ interface Habit {
   displayStreak: number;
 }
 
-interface SwipeableHabitCardProps {
+interface HabitCardProps {
   habit: Habit;
   isCompleted: boolean;
   onCheckIn: () => void;
   onDelete: () => void;
 }
 
-export default function SwipeableHabitCard({
+export default function HabitCard({
   habit,
   isCompleted,
   onCheckIn,
   onDelete,
-}: SwipeableHabitCardProps) {
-  const translateX = useRef(new Animated.Value(0)).current;
-  const isSwipedOpen = useRef(false);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        return Math.abs(gestureState.dx) > 10 && Math.abs(gestureState.dy) < 10;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dx < 0) {
-          translateX.setValue(Math.max(gestureState.dx, -100));
-        } else if (isSwipedOpen.current) {
-          translateX.setValue(Math.min(gestureState.dx - 80, 0));
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dx < SWIPE_THRESHOLD) {
-          Animated.spring(translateX, {
-            toValue: -80,
-            useNativeDriver: true,
-            tension: 100,
-            friction: 10,
-          }).start();
-          isSwipedOpen.current = true;
-        } else {
-          Animated.spring(translateX, {
-            toValue: 0,
-            useNativeDriver: true,
-            tension: 100,
-            friction: 10,
-          }).start();
-          isSwipedOpen.current = false;
-        }
-      },
-    })
-  ).current;
-
-  const closeSwipe = () => {
-    Animated.spring(translateX, {
-      toValue: 0,
-      useNativeDriver: true,
-      tension: 100,
-      friction: 10,
-    }).start();
-    isSwipedOpen.current = false;
-  };
-
-  const handleDelete = () => {
-    closeSwipe();
-    onDelete();
-  };
+}: HabitCardProps) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handlePress = () => {
-    if (isSwipedOpen.current) {
-      closeSwipe();
-    } else if (!isCompleted) {
+    if (!isCompleted) {
       onCheckIn();
     }
   };
 
-  return (
-    <View style={styles.container}>
-      {/* Delete Button (behind card) */}
-      <View style={styles.deleteContainer}>
-        <Pressable style={styles.deleteButton} onPress={handleDelete}>
-          <Ionicons name="trash-outline" size={24} color={Colors.textPrimary} />
-        </Pressable>
-      </View>
+  const handleLongPress = () => {
+    setShowDeleteModal(true);
+  };
 
-      {/* Main Card - SOLID backgrounds */}
-      <Animated.View
-        style={[
+  const handleConfirmDelete = () => {
+    setShowDeleteModal(false);
+    onDelete();
+  };
+
+  return (
+    <>
+      <Pressable
+        style={({ pressed }) => [
           styles.card,
           isCompleted ? styles.cardCompleted : styles.cardIncomplete,
-          { transform: [{ translateX }] },
+          pressed && styles.cardPressed,
         ]}
-        {...panResponder.panHandlers}
+        onPress={handlePress}
+        onLongPress={handleLongPress}
+        delayLongPress={500}
       >
-        <Pressable style={styles.cardContent} onPress={handlePress}>
-          {/* Left Side - Habit Info */}
-          <View style={styles.habitInfo}>
-            <Text style={[styles.habitName, isCompleted && styles.habitNameCompleted]}>
-              {habit.name}
-            </Text>
-            <Text style={styles.habitDescription} numberOfLines={1}>
-              {isCompleted ? 'Completed' : habit.description}
-            </Text>
-          </View>
+        {/* Left Side - Habit Info */}
+        <View style={styles.habitInfo}>
+          <Text style={[styles.habitName, isCompleted && styles.habitNameCompleted]}>
+            {habit.name}
+          </Text>
+          <Text style={styles.habitDescription} numberOfLines={1}>
+            {isCompleted ? 'Completed' : habit.description}
+          </Text>
+        </View>
 
-          {/* Right Side - Streak & Action */}
-          <View style={styles.rightSection}>
-            {/* Streak Badge */}
-            <View style={[
-              styles.streakBadge,
-              habit.displayStreak > 0 && styles.streakBadgeActive
+        {/* Right Side - Streak & Action */}
+        <View style={styles.rightSection}>
+          {/* Streak Badge */}
+          <View style={[
+            styles.streakBadge,
+            habit.displayStreak > 0 && styles.streakBadgeActive
+          ]}>
+            <Ionicons 
+              name="flame" 
+              size={14} 
+              color={habit.displayStreak > 0 ? Colors.streak : Colors.textMuted} 
+            />
+            <Text style={[
+              styles.streakText,
+              habit.displayStreak > 0 && styles.streakTextActive
             ]}>
-              <Ionicons 
-                name="flame" 
-                size={14} 
-                color={habit.displayStreak > 0 ? Colors.streak : Colors.textMuted} 
-              />
-              <Text style={[
-                styles.streakText,
-                habit.displayStreak > 0 && styles.streakTextActive
-              ]}>
-                {habit.displayStreak}
-              </Text>
-            </View>
-
-            {/* Action Button */}
-            {isCompleted ? (
-              <View style={styles.completedIcon}>
-                <Ionicons name="checkmark" size={20} color={Colors.success} />
-              </View>
-            ) : (
-              <View style={styles.checkInButton}>
-                <Ionicons name="camera-outline" size={20} color={Colors.buttonPrimaryText} />
-              </View>
-            )}
+              {habit.displayStreak}
+            </Text>
           </View>
-        </Pressable>
-      </Animated.View>
-    </View>
+
+          {/* Action Button */}
+          {isCompleted ? (
+            <View style={styles.completedIcon}>
+              <Ionicons name="checkmark" size={20} color={Colors.success} />
+            </View>
+          ) : (
+            <View style={styles.checkInButton}>
+              <Ionicons name="camera-outline" size={20} color={Colors.buttonPrimaryText} />
+            </View>
+          )}
+        </View>
+      </Pressable>
+
+      {/* Delete Confirmation Modal */}
+      <ApexModal
+        visible={showDeleteModal}
+        mood="talking"
+        title="Throwing in the towel?"
+        message={`You sure you want to bin "${habit.name}"? Once it's gone, it's gone mate. No coming back from this one.`}
+        buttonText="Nah, keep it"
+        onClose={() => setShowDeleteModal(false)}
+        secondaryButtonText="Delete it"
+        onSecondaryPress={handleConfirmDelete}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: Spacing.md,
-    position: 'relative',
-  },
-  deleteContainer: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.danger,
-    borderRadius: BorderRadius.card,
-  },
-  deleteButton: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Spacing.lg,
+    marginBottom: Spacing.md,
     borderRadius: BorderRadius.card,
     borderWidth: 1,
     ...Shadows.card,
@@ -195,13 +130,12 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   cardCompleted: {
-    backgroundColor: '#1F2A1C', // Solid dark green - NO transparency
+    backgroundColor: '#1F2A1C',
     borderColor: Colors.completeBorder,
   },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: Spacing.lg,
+  cardPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
   habitInfo: {
     flex: 1,
@@ -253,7 +187,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1F2A1C', // Solid dark green
+    backgroundColor: '#1F2A1C',
     borderWidth: 1,
     borderColor: Colors.completeBorder,
     alignItems: 'center',

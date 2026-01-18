@@ -1,5 +1,5 @@
 // app/(tabs)/index.tsx
-// Visual Novel Style Home Screen - Paddy LARGER and prominent
+// Visual Novel Style Home Screen - With Settings Gear Icon
 
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,6 +9,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
+  Pressable,
   RefreshControl,
   StatusBar,
   StyleSheet,
@@ -112,6 +113,39 @@ function getDisplayStreak(habit: Habit): number {
   return 0;
 }
 
+// ============== SETTINGS BUTTON COMPONENT ==============
+
+function SettingsButton({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        settingsButtonStyles.container,
+        pressed && settingsButtonStyles.pressed,
+      ]}
+      onPress={onPress}
+    >
+      <Ionicons name="settings-outline" size={22} color={Colors.textPrimary} />
+    </Pressable>
+  );
+}
+
+const settingsButtonStyles = StyleSheet.create({
+  container: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  pressed: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    transform: [{ scale: 0.95 }],
+  },
+});
+
 // ============== PROGRESS BAR COMPONENT ==============
 
 function WarmProgressBar({ completed, total }: { completed: number; total: number }) {
@@ -192,7 +226,7 @@ const progressStyles = StyleSheet.create({
 
 // ============== DIALOGUE BOX COMPONENT ==============
 
-function DialogueBox({ message, completed, total }: { message: string; completed: number; total: number }) {
+function DialogueBox({ message }: { message: string }) {
   return (
     <View style={dialogueStyles.container}>
       <View style={dialogueStyles.nameplate}>
@@ -200,13 +234,6 @@ function DialogueBox({ message, completed, total }: { message: string; completed
       </View>
       
       <View style={dialogueStyles.dialogueContent}>
-        {total > 0 && (
-          <View style={dialogueStyles.statsBadge}>
-            <Ionicons name="flame" size={14} color={Colors.streak} />
-            <Text style={dialogueStyles.statsText}>{completed}/{total}</Text>
-          </View>
-        )}
-        
         <Text style={dialogueStyles.messageText}>{message}</Text>
       </View>
     </View>
@@ -244,30 +271,11 @@ const dialogueStyles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     minHeight: 90,
   },
-  statsBadge: {
-    position: 'absolute',
-    top: Spacing.md,
-    right: Spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.accentDim,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.sm,
-  },
-  statsText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.streak,
-    marginLeft: 4,
-    fontVariant: ['tabular-nums'],
-  },
   messageText: {
     fontSize: 16,
     fontWeight: '500',
     color: Colors.textPrimary,
     lineHeight: 24,
-    paddingRight: 50,
   },
 });
 
@@ -343,6 +351,7 @@ export default function HomeScreen() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Pass the ENTIRE habit object so check-in screen has all data immediately
   const handleCheckIn = useCallback((habitId: string) => {
     router.push(`/checkin/${habitId}`);
   }, [router]);
@@ -371,6 +380,11 @@ export default function HomeScreen() {
     setRefreshing(true);
   }, []);
 
+  // Navigate to Settings
+  const handleOpenSettings = useCallback(() => {
+    router.push('/settings');
+  }, [router]);
+
   const completedCount = habits.filter(h => isCompletedToday(h)).length;
   const totalCount = habits.length;
 
@@ -386,6 +400,13 @@ export default function HomeScreen() {
     extrapolateRight: 'clamp',
   });
 
+  // Settings button opacity - fades slightly when scrolling
+  const settingsOpacity = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [1, 0.7],
+    extrapolate: 'clamp',
+  });
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -398,6 +419,19 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+
+      {/* Settings Button - Fixed Position */}
+      <Animated.View 
+        style={[
+          styles.settingsButtonContainer, 
+          { 
+            top: insets.top + Spacing.sm,
+            opacity: settingsOpacity,
+          }
+        ]}
+      >
+        <SettingsButton onPress={handleOpenSettings} />
+      </Animated.View>
 
       {/* Character Section - Image extends behind status bar for full effect */}
       <View style={styles.characterSection}>
@@ -429,6 +463,8 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
+        bounces={false}
+        overScrollMode="never"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -451,8 +487,6 @@ export default function HomeScreen() {
           <View style={styles.dialogueWrapper}>
             <DialogueBox
               message={getMotivationalMessage(completedCount, totalCount)}
-              completed={completedCount}
-              total={totalCount}
             />
           </View>
 
@@ -468,9 +502,11 @@ export default function HomeScreen() {
 
           {habits.length === 0 ? (
             <View style={styles.emptyState}>
-              <View style={styles.emptyIcon}>
-                <Ionicons name="add-circle-outline" size={48} color={Colors.textMuted} />
-              </View>
+              <Pressable onPress={() => router.push('/(tabs)/add')}>
+                <View style={styles.emptyIcon}>
+                  <Ionicons name="add-circle-outline" size={48} color={Colors.textMuted} />
+                </View>
+              </Pressable>
               <Text style={styles.emptyTitle}>NO HABITS YET</Text>
               <Text style={styles.emptyText}>
                 Create your first habit to get started with The Apex Lad.
@@ -525,6 +561,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 2,
     marginTop: Spacing.md,
+  },
+  // Settings Button - Fixed top right
+  settingsButtonContainer: {
+    position: 'absolute',
+    right: Spacing.md,
+    zIndex: 100,
   },
   characterSection: {
     position: 'absolute',

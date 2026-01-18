@@ -9,8 +9,10 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const MODAL_WIDTH = SCREEN_WIDTH - 48;
 
 type ApexMood = 'pleased' | 'talking';
 
@@ -49,29 +51,37 @@ export default function ApexModal({
     >
       <View style={styles.overlay}>
         <View style={styles.container}>
+          {/* Character Image - Square aspect ratio */}
           <View style={styles.imageContainer}>
             <Image
               source={moodImages[mood]}
               style={styles.characterImage}
-              resizeMode="cover"
+              resizeMode="contain"
             />
+            {/* Success checkmark for pleased mood */}
+            {mood === 'pleased' && (
+              <View style={styles.checkmark}>
+                <Ionicons name="checkmark" size={20} color="#fff" />
+              </View>
+            )}
           </View>
-          
+
+          {/* Content */}
           <View style={styles.contentContainer}>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.message}>{message}</Text>
-            
+
             <View style={styles.buttonRow}>
-              <TouchableOpacity 
-                style={[styles.button, secondaryButtonText && styles.buttonHalf]} 
+              <TouchableOpacity
+                style={[styles.button, secondaryButtonText && styles.buttonHalf]}
                 onPress={onClose}
               >
                 <Text style={styles.buttonText}>{buttonText}</Text>
               </TouchableOpacity>
-              
+
               {secondaryButtonText && onSecondaryPress && (
-                <TouchableOpacity 
-                  style={[styles.button, styles.buttonHalf, styles.deleteButton]} 
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonHalf, styles.deleteButton]}
                   onPress={() => {
                     onSecondaryPress();
                     onClose();
@@ -94,10 +104,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 24,
   },
   container: {
-    width: SCREEN_WIDTH - 40,
+    width: MODAL_WIDTH,
     backgroundColor: '#1a1210',
     borderRadius: 16,
     overflow: 'hidden',
@@ -106,60 +116,76 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: 200,
+    aspectRatio: 0.85, // Taller than wide to fit full character
     backgroundColor: '#0a0604',
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   characterImage: {
     width: '100%',
     height: '100%',
+  },
+  checkmark: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#22c55e',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   contentContainer: {
     padding: 20,
     alignItems: 'center',
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#FFD700',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
+    letterSpacing: 1,
   },
   message: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#f4e7d7',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
     marginBottom: 20,
   },
   buttonRow: {
     flexDirection: 'row',
     gap: 12,
+    width: '100%',
   },
   button: {
     backgroundColor: '#FFD700',
     paddingVertical: 14,
-    paddingHorizontal: 40,
+    paddingHorizontal: 24,
     borderRadius: 8,
-    minWidth: 150,
+    flex: 1,
   },
   buttonHalf: {
     flex: 1,
-    minWidth: 0,
-    paddingHorizontal: 20,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '700',
     color: '#0a0604',
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
   deleteButton: {
-    backgroundColor: 'rgba(255, 59, 48, 0.9)',
+    backgroundColor: 'rgba(239, 68, 68, 0.9)',
   },
   deleteButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '700',
     color: '#fff',
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
 });

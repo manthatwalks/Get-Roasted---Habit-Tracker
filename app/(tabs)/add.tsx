@@ -1,5 +1,5 @@
 // app/(tabs)/add.tsx
-// Create Habit Screen - NO Paddy
+// Create Habit Screen - Clean & Simple
 
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -28,7 +28,6 @@ import { BorderRadius, Colors, Shadows, Spacing } from '../../constants/theme';
 
 interface WarmInputProps {
   label: string;
-  hint?: string;
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
@@ -38,11 +37,11 @@ interface WarmInputProps {
   returnKeyType?: 'next' | 'done';
   onSubmitEditing?: () => void;
   blurOnSubmit?: boolean;
+  helperText?: string;
 }
 
 function WarmInput({
   label,
-  hint,
   placeholder,
   value,
   onChangeText,
@@ -52,11 +51,12 @@ function WarmInput({
   returnKeyType,
   onSubmitEditing,
   blurOnSubmit,
+  helperText,
 }: WarmInputProps) {
   return (
     <View style={inputStyles.container}>
       <Text style={inputStyles.label}>{label}</Text>
-      {hint && <Text style={inputStyles.hint}>{hint}</Text>}
+      {helperText && <Text style={inputStyles.helperText}>{helperText}</Text>}
       <TextInput
         style={[
           inputStyles.input,
@@ -86,12 +86,13 @@ const inputStyles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.textSecondary,
     letterSpacing: 1,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
-  hint: {
-    fontSize: 12,
+  helperText: {
+    fontSize: 13,
     color: Colors.textMuted,
     marginBottom: Spacing.sm,
+    lineHeight: 18,
   },
   input: {
     backgroundColor: Colors.surface,
@@ -136,10 +137,10 @@ function WarmButton({ title, onPress, icon, loading, disabled }: WarmButtonProps
       ) : (
         <>
           {icon && (
-            <Ionicons 
-              name={icon} 
-              size={20} 
-              color={Colors.buttonPrimaryText} 
+            <Ionicons
+              name={icon}
+              size={20}
+              color={Colors.buttonPrimaryText}
               style={buttonStyles.icon}
             />
           )}
@@ -248,10 +249,11 @@ export default function AddHabitScreen() {
 
       setHabitName('');
       setDescription('');
+
       showModal(
         'pleased',
         'SORTED!',
-        'Your new habit is ready to go. Now let\'s see you stick to it!',
+        "Your new habit is ready to go. Now let's see you stick to it!",
         "LET'S GO",
         true
       );
@@ -276,7 +278,6 @@ export default function AddHabitScreen() {
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
@@ -284,15 +285,8 @@ export default function AddHabitScreen() {
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
+            automaticallyAdjustKeyboardInsets={true}
           >
-            {/* Instructions */}
-            <View style={styles.instructionBox}>
-              <Ionicons name="information-circle-outline" size={20} color={Colors.textMuted} />
-              <Text style={styles.instructionText}>
-                Define your habit and specify what photo evidence proves completion.
-              </Text>
-            </View>
-
             {/* Form */}
             <View style={styles.form}>
               <WarmInput
@@ -305,50 +299,28 @@ export default function AddHabitScreen() {
               />
 
               <WarmInput
-                label="VERIFICATION CRITERIA"
-                hint="What should I look for in your photo proof?"
-                placeholder="e.g., Photo showing gym equipment or exercise activity"
+                label="PHOTO VERIFICATION"
+                helperText="Alright lad, tell me exactly what you're snapping for proof. Be clear—I'll hold you to it."
+                placeholder="e.g., Gym selfie or running shoes on feet"
                 value={description}
                 onChangeText={setDescription}
                 multiline
-                numberOfLines={4}
+                numberOfLines={3}
                 returnKeyType="done"
                 blurOnSubmit={true}
                 onSubmitEditing={Keyboard.dismiss}
                 maxLength={200}
               />
-
-              {/* Character Count */}
-              <View style={styles.charCount}>
-                <Text style={styles.charCountText}>
-                  {description.length}/200
-                </Text>
-              </View>
             </View>
 
             {/* Submit Button */}
-            <View style={styles.buttonContainer}>
-              <WarmButton
-                title="CREATE HABIT"
-                onPress={createHabit}
-                loading={loading}
-                disabled={loading}
-                icon="add-circle-outline"
-              />
-            </View>
-
-            {/* Tips Section */}
-            <View style={styles.tipsSection}>
-              <View style={styles.tipsHeader}>
-                <Ionicons name="bulb-outline" size={16} color={Colors.accent} />
-                <Text style={styles.tipsTitle}>TIPS FOR GOOD CRITERIA</Text>
-              </View>
-              <Text style={styles.tipText}>
-                Be specific about what should appear in the photo. Include visual elements that can be identified. Avoid vague descriptions like "me being healthy" - tell me exactly what to look for!
-              </Text>
-            </View>
-
-            <View style={styles.bottomPadding} />
+            <WarmButton
+              title="CREATE HABIT"
+              onPress={createHabit}
+              loading={loading}
+              disabled={loading}
+              icon="add-circle-outline"
+            />
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -393,67 +365,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xl,
-  },
-  instructionBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: Spacing.lg,
-    marginBottom: Spacing.xxl,
-  },
-  instructionText: {
-    flex: 1,
-    fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 20,
-    marginLeft: Spacing.md,
+    paddingTop: Spacing.xxl,
+    paddingBottom: 20,
   },
   form: {
-    marginBottom: Spacing.lg,
-  },
-  charCount: {
-    alignItems: 'flex-end',
-    marginTop: -Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  charCountText: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    fontVariant: ['tabular-nums'],
-  },
-  buttonContainer: {
-    marginBottom: Spacing.xxl,
-  },
-  tipsSection: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.card,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: Spacing.lg,
-  },
-  tipsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  tipsTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: Colors.textMuted,
-    letterSpacing: 1.5,
-    marginLeft: Spacing.sm,
-  },
-  tipText: {
-    fontSize: 13,
-    color: Colors.textMuted,
-    lineHeight: 20,
-  },
-  bottomPadding: {
-    height: 40,
+    marginBottom: Spacing.xl,
   },
 });

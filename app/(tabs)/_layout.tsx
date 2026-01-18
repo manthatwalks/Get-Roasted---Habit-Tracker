@@ -1,10 +1,9 @@
 // app/(tabs)/_layout.tsx
-// Tactical Tab Navigation
-
-import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { Tabs } from 'expo-router';
+// Tactical Tab Navigation - Consistent button styling
 import { Ionicons } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import { Colors, Spacing } from '../../constants/theme';
 
 export default function TabLayout() {
@@ -39,11 +38,11 @@ export default function TabLayout() {
         options={{
           title: 'Create',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.addButtonContainer, focused && styles.addButtonActive]}>
+            <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
               <Ionicons
-                name="add"
-                size={28}
-                color={focused ? Colors.background : Colors.gold}
+                name={focused ? 'add-circle' : 'add-circle-outline'}
+                size={24}
+                color={color}
               />
             </View>
           ),
@@ -92,20 +91,5 @@ const styles = StyleSheet.create({
   },
   iconContainerActive: {
     backgroundColor: Colors.goldMuted,
-  },
-  addButtonContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: Colors.gold,
-    marginTop: -8,
-  },
-  addButtonActive: {
-    backgroundColor: Colors.gold,
-    borderColor: Colors.gold,
   },
 });

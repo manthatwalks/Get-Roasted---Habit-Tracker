@@ -1,5 +1,5 @@
 // components/ApexModal.tsx
-// Tactical Modal Component
+// Tactical Modal Component - Larger image container
 
 import React from 'react';
 import {
@@ -65,15 +65,13 @@ export default function ApexModal({
             />
           </View>
 
-          {/* Image Section */}
+          {/* Image Section - LARGER */}
           <View style={styles.imageContainer}>
             <Image
               source={moodImages[mood]}
               style={styles.characterImage}
               resizeMode="cover"
             />
-            {/* Gradient Overlay */}
-            <View style={styles.imageGradient} />
           </View>
 
           {/* Content */}
@@ -148,22 +146,12 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: 180,
-    backgroundColor: Colors.background,
-    position: 'relative',
+    height: 280,
+    backgroundColor: Colors.surface,
   },
   characterImage: {
     width: '100%',
     height: '100%',
-  },
-  imageGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: 'transparent',
-    // Using a simple fade since LinearGradient isn't imported
   },
   contentContainer: {
     padding: Spacing.xl,

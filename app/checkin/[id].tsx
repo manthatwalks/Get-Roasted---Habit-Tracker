@@ -1,8 +1,9 @@
 // app/checkin/[id].tsx
 // Check-In Screen - NO Paddy, clean header
 
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { addDoc, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
@@ -10,19 +11,18 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
+  Pressable,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   View,
-  StatusBar,
-  Pressable,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { auth, db, storage } from '../../config/firebase';
-import { Colors, Spacing, BorderRadius, Shadows } from '../../constants/theme';
 import ApexModal from '../../components/ApexModal';
 import ApexSuccessScreen from '../../components/ApexSuccessScreen';
+import { auth, db, storage } from '../../config/firebase';
+import { BorderRadius, Colors, Shadows, Spacing } from '../../constants/theme';
 
 // ============== HELPERS ==============
 
@@ -184,14 +184,26 @@ const buttonStyles = StyleSheet.create({
 // ============== MAIN COMPONENT ==============
 
 export default function CheckInScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, habitData } = useLocalSearchParams<{ id: string; habitData?: string }>();
   const router = useRouter();
   const functions = getFunctions();
   const insets = useSafeAreaInsets();
 
-  const [habit, setHabit] = useState<Habit | null>(null);
+  // Parse habit data from params immediately (no loading needed)
+  const initialHabit = React.useMemo(() => {
+    if (habitData) {
+      try {
+        return JSON.parse(habitData) as Habit;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }, [habitData]);
+
+  const [habit, setHabit] = useState<Habit | null>(initialHabit);
   const [imageUri, setImageUri] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialHabit); // Only load if no data passed
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
 
@@ -211,9 +223,12 @@ export default function CheckInScreen() {
     roastMessage: '',
   });
 
+  // Only fetch from Firestore if no habit data was passed (fallback)
   useEffect(() => {
-    loadHabit();
-  }, [id]);
+    if (!initialHabit) {
+      loadHabit();
+    }
+  }, [id, initialHabit]);
 
   const loadHabit = async () => {
     try {
@@ -419,21 +434,31 @@ export default function CheckInScreen() {
     return await getDownloadURL(storageRef);
   };
 
+  // Loading state - with header hidden
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Ionicons name="hourglass-outline" size={32} color={Colors.accent} />
-        <Text style={styles.loadingText}>LOADING...</Text>
-      </View>
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.loadingContainer}>
+          <StatusBar barStyle="light-content" />
+          <Ionicons name="hourglass-outline" size={32} color={Colors.accent} />
+          <Text style={styles.loadingText}>LOADING...</Text>
+        </View>
+      </>
     );
   }
 
+  // Error state - with header hidden
   if (!habit) {
     return (
-      <View style={styles.loadingContainer}>
-        <Ionicons name="alert-circle-outline" size={32} color={Colors.danger} />
-        <Text style={styles.loadingText}>HABIT NOT FOUND</Text>
-      </View>
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.loadingContainer}>
+          <StatusBar barStyle="light-content" />
+          <Ionicons name="alert-circle-outline" size={32} color={Colors.danger} />
+          <Text style={styles.loadingText}>HABIT NOT FOUND</Text>
+        </View>
+      </>
     );
   }
 
