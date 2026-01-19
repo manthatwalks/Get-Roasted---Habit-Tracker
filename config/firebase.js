@@ -8,7 +8,7 @@ import { getStorage } from 'firebase/storage';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCMHUblQxiDxzZKMcB1UAXc-Qfy-hBmjXA", 
+  apiKey: "omitted", 
   authDomain: "get-roasted-cf2aa.firebaseapp.com",
   projectId: "get-roasted-cf2aa",
   storageBucket: "get-roasted-cf2aa.firebasestorage.app",
