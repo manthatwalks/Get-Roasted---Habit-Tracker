@@ -417,7 +417,7 @@ export const cleanupRateLimits = onSchedule(
 
 export const midnightStreakReset = onSchedule(
   {
-    schedule: 'every 1 hours',
+    schedule: '0 * * * *', // Run exactly on the hour
     timeZone: 'UTC',
   },
   async () => {
@@ -486,7 +486,7 @@ export const midnightStreakReset = onSchedule(
 
 export const sendDailyReminders = onSchedule(
   {
-    schedule: 'every 1 hours',
+    schedule: '0 * * * *', // Run exactly on the hour
     timeZone: 'UTC',
   },
   async () => {
@@ -586,7 +586,7 @@ export const sendDailyReminders = onSchedule(
 
 export const sendStreakWarnings = onSchedule(
   {
-    schedule: 'every 1 hours',
+    schedule: '0 * * * *', // Run exactly on the hour
     timeZone: 'UTC',
   },
   async () => {
