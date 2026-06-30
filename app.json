@@ -7,9 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "apexlad",
     "userInterfaceStyle": "dark",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.1",
     "updates": {
       "url": "https://u.expo.dev/53d4b067-7ab9-46ce-aef8-680c04a9030e"
     },
