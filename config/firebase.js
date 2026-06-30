@@ -6,15 +6,19 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration.
+// A Firebase web API key is a public client identifier, not a secret —
+// protect your data with Firestore Security Rules and API key restrictions,
+// not by hiding this value. The hardcoded fallback ensures cloud (EAS) builds
+// always have the key, since the gitignored .env is not uploaded to EAS.
 const firebaseConfig = {
-  apiKey: "omitted", 
-  authDomain: "get-roasted-cf2aa.firebaseapp.com",
-  projectId: "get-roasted-cf2aa",
-  storageBucket: "get-roasted-cf2aa.firebasestorage.app",
-  messagingSenderId: "11276683184",
-  appId: "1:11276683184:web:1e7fb27f5f0bd0b8417875",
-  measurementId: "G-LTNNKTXCBP"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "AIzaSyA46mShRAIA5aVxzoHTSvlL4Eve8jOO3F8",
+  authDomain: "get-roasted-1.firebaseapp.com",
+  projectId: "get-roasted-1",
+  storageBucket: "get-roasted-1.firebasestorage.app",
+  messagingSenderId: "76344258138",
+  appId: "1:76344258138:web:b0a3e26a57f4af82393263",
+  measurementId: "G-4WXY9J06XX"
 };
 
 // Initialize Firebase

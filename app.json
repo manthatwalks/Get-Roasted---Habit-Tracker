@@ -2,11 +2,17 @@
   "expo": {
     "name": "Apex Lad",
     "slug": "apex-lad",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "apexlad",
     "userInterfaceStyle": "dark",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/53d4b067-7ab9-46ce-aef8-680c04a9030e"
+    },
     "splash": {
       "backgroundColor": "#1A1512"
     },

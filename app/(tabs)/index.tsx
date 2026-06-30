@@ -304,18 +304,28 @@ export default function HomeScreen() {
     const habitsRef = collection(db, 'users', userId, 'habits');
     const q = query(habitsRef);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const habitsData: HabitWithDisplayStreak[] = [];
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const habit = { id: docSnap.id, ...data } as Habit;
-        const displayStreak = getDisplayStreak(habit);
-        habitsData.push({ ...habit, displayStreak });
-      });
-      setHabits(habitsData);
-      setLoading(false);
-      setRefreshing(false);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const habitsData: HabitWithDisplayStreak[] = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const habit = { id: docSnap.id, ...data } as Habit;
+          const displayStreak = getDisplayStreak(habit);
+          habitsData.push({ ...habit, displayStreak });
+        });
+        setHabits(habitsData);
+        setLoading(false);
+        setRefreshing(false);
+      },
+      // Without this, a failed read (e.g. denied security rules) leaves the
+      // screen stuck on "LOADING..." forever. Surface it instead of hanging.
+      (error) => {
+        console.error('Error loading habits:', error);
+        setLoading(false);
+        setRefreshing(false);
+      }
+    );
 
     return () => unsubscribe();
   }, []);

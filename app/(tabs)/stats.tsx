@@ -647,6 +647,10 @@ export default function StatsScreen() {
       });
       setHabits(habitsData);
       setLoading(false);
+    },
+    (error) => {
+      console.error('Error loading habits:', error);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -673,6 +677,9 @@ export default function StatsScreen() {
         });
       });
       setCheckIns(checkInsData);
+    },
+    (error) => {
+      console.error('Error loading check-ins:', error);
     });
 
     return () => unsubscribe();
